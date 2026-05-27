@@ -1,0 +1,40 @@
+import hashlib
+
+def hitung_sha256(data):
+    """Fungsi untuk menghasilkan hash SHA-256 dari sebuah teks."""
+    # Mengubah teks menjadi bytes kemudian menghitung hash-nya
+    return hashlib.sha256(data.encode('utf-8')).hexdigest()
+
+# 1. Menentukan data transaksi awal
+data_awal = "Andi transfer 100000 ke Budi"
+
+# 2. Menghasilkan hash dari data transaksi awal
+hash_awal = hitung_sha256(data_awal)
+
+# 3. Menentukan data transaksi yang sudah diubah
+data_diubah = "Andi transfer 900000 ke Budi"
+
+# 4. Menghasilkan hash dari data transaksi yang sudah diubah
+hash_diubah = hitung_sha256(data_diubah)
+
+# 5. Menampilkan hasil sesuai format "Contoh Output Program"
+print("=== MINI CASE: PEMERIKSAAN INTEGRITAS DATA ===")
+print("Data Awal:")
+print(data_awal)
+print("Hash Data Awal:")
+print(hash_awal)
+print()
+print("Data Setelah Diubah:")
+print(data_diubah)
+print("Hash Data Setelah Diubah:")
+print(hash_diubah)
+print()
+print("HASIL PEMERIKSAAN")
+
+# 6. Membandingkan hash dan menarik kesimpulan
+if hash_awal == hash_diubah:
+    print("Data tidak berubah.")
+    print("Hash data awal dan hash data setelah diubah sama.")
+else:
+    print("Data berubah.")
+    print("Hash data awal dan hash data setelah diubah berbeda.")

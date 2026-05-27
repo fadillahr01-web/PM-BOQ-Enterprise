@@ -1,0 +1,11 @@
+{
+  "name": "pm-boq-enterprise",
+  "version": "1.0.0",
+  "description": "Root package for PM-BOQ Enterprise",
+  "scripts": {
+    "install:all": "npm install --prefix Backend && npm install --prefix Frontend",
+    "dev:backend": "npm run dev --prefix Backend",
+    "dev:frontend": "npm run dev --prefix Frontend",
+    "dev": "npx -y concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+  }
+}
