@@ -6,11 +6,11 @@ COPY package*.json ./
 
 RUN npm install
 
-# Salin seluruh kode backend terlebih dahulu
+# Salin semua kode backend
 COPY . .
 
-# Jalankan generate secara mandiri jika library-nya terpasang di package.json
-RUN npx prisma generate --schema=./node_modules/.prisma/client || true
+# Generate Prisma client dari schema utama
+RUN npx prisma generate --schema=./models/schema.prisma
 
 EXPOSE 7860
 ENV PORT=7860
