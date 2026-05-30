@@ -1,17 +1,14 @@
+const { Pool } = require('pg');
+const { PrismaPg } = require('@prisma/adapter-pg');
 const { PrismaClient } = require('@prisma/client');
 
-// Singleton pattern for serverless environments (Vercel)
-// Prevents creating multiple PrismaClient instances on hot-reload
-const globalForPrisma = globalThis;
+// 1. Buat koneksi pool menggunakan pg driver bawaan node
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-const prisma =
-  globalForPrisma.__prisma ||
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
-  });
+// 2. Masukkan pool ke dalam adapter Prisma
+const adapter = new PrismaPg(pool);
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.__prisma = prisma;
-}
+// 3. Inisialisasi Prisma dengan adapter (Ini akan otomatis menggunakan WASM Engine)
+const prisma = new PrismaClient({ adapter });
 
-module.exports = { prisma };
+module.exports = prisma;
