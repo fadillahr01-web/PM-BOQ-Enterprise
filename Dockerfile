@@ -1,4 +1,8 @@
-FROM node:18-alpine
+# Menggunakan versi Debian Slim yang jauh lebih stabil untuk Prisma
+FROM node:18-slim
+
+# Menginstal OpenSSL secara manual agar Prisma tidak panik
+RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /app
 
@@ -6,10 +10,12 @@ WORKDIR /app
 COPY Backend/package*.json ./
 RUN npm install
 
-# Menyalin seluruh isi folder Backend ke dalam container
+# Menyalin seluruh file backend Anda
 COPY Backend/ .
 
+# Memaksa server Node.js Anda untuk menggunakan port wajib Hugging Face
+ENV PORT=7860
 EXPOSE 7860
 
-# Kita pindahkan npx prisma generate ke dalam perintah CMD sebelum npm start
+# Melakukan generate skema dan menyalakan server
 CMD npx prisma generate --schema=./models/schema.prisma && npm start
