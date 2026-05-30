@@ -1,31 +1,17 @@
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
-}
-
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  PROJECT_MANAGER
-  SUPERVISOR
-  STAFF
-  CLIENT_VIEWER
+generator client {
+  provider      = "prisma-client-js"
+  engineType    = "wasm"
 }
 
-enum TaskStatus {
-  NOT_STARTED
-  ON_PROGRESS
-  DONE
-  PENDING
-}
-
-enum Priority {
-  LOW
-  MEDIUM
-  HIGH
+// Ini adalah model wajib yang diminta oleh mesin Prisma agar tidak eror
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
 }
