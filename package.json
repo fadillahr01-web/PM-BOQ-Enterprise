@@ -9,6 +9,17 @@
     "dev": "npx -y concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "prisma:generate": "npx prisma generate --schema=Backend/models/schema.prisma",
     "prisma:push": "npx prisma db push --schema=Backend/models/schema.prisma",
-    "vercel-build": "cd Backend && npx prisma generate --schema=models/schema.prisma && cd ../Frontend && npm run build"
+    "vercel-build": "npx prisma generate --schema=Backend/models/schema.prisma && cd Frontend && npm run build"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.14.0"
   }
 }
