@@ -1,10 +1,262 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-1.1.x"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  PROJECT_MANAGER
+  SUPERVISOR
+  STAFF
+  CLIENT_VIEWER
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  ON_PROGRESS
+  DONE
+  PENDING
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MilestoneStatus {
+  NOT_STARTED
+  ON_PROGRESS
+  DONE
+  PENDING
+  CANCEL
+}
+
+enum ProjectStatus {
+  BOQ
+  SURVEY
+  TENDER
+  PO
+  SPK
+  BAUT
+  BAST
+}
+
+// USER MODEL
+model User {
+  id         String             @id @default(uuid())
+  email      String             @unique
+  password   String
+  name       String
+  role       Role               @default(STAFF)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  tasks      Task[]             @relation("TaskAssignee")
+  projects   ProjectMember[]
+  milestones ProjectMilestone[]
+}
+
+// PROJECT MODEL
+model Project {
+  id              String             @id @default(uuid())
+  name            String
+  description     String?
+  clientName      String
+  location        String
+  budget          Decimal            @db.Decimal(15, 2)
+  actualCost      Decimal            @default(0.00) @db.Decimal(15, 2)
+  startDate       DateTime
+  endDate         DateTime
+  plannedProgress Float              @default(0.0)
+  actualProgress  Float              @default(0.0)
+  status          ProjectStatus      @default(BOQ)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  tasks           Task[]
+  boqCategories   BoqCategory[]
+  members         ProjectMember[]
+  documents       Document[]
+  milestones      ProjectMilestone[]
+  progressLogs    ProgressLog[]
+  boqs            BOQ[]
+}
+
+// PROJECT MEMBER (untuk RBAC)
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+// TASK MODEL
+model Task {
+  id          String     @id @default(uuid())
+  projectId   String
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  status      TaskStatus @default(NOT_STARTED)
+  priority    Priority   @default(MEDIUM)
+  progress    Float      @default(0.0)
+  assigneeId  String?
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee    User?      @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  subTasks    SubTask[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+// SUB-TASK MODEL
+model SubTask {
+  id          String   @id @default(uuid())
+  taskId      String
+  name        String
+  isCompleted Boolean  @default(false)
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+// BOQ CATEGORY MODEL
+model BoqCategory {
+  id        String    @id @default(uuid())
+  projectId String
+  name      String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items     BoqItem[]
+}
+
+// BOQ ITEM MODEL (untuk kategori-based BOQ)
+model BoqItem {
+  id          String      @id @default(uuid())
+  categoryId  String
+  type        String
+  materialId  String?
+  serviceId   String?
+  description String
+  merk        String?
+  volume      Float
+  unit        String
+  unitPrice   Decimal     @db.Decimal(15, 2)
+  totalPrice  Decimal     @db.Decimal(15, 2)
+  progress    Float       @default(0.0)
+  remarks     String?
+  category    BoqCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  material    Material?   @relation(fields: [materialId], references: [id])
+  service     Service?    @relation(fields: [serviceId], references: [id])
+}
+
+// MATERIAL MODEL (untuk PERANGKAT)
+model Material {
+  id        String    @id @default(uuid())
+  name      String
+  unit      String
+  unitPrice Decimal   @db.Decimal(15, 2)
+  merk      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  boqItems  BoqItem[]
+}
+
+// SERVICE MODEL (untuk JASA)
+model Service {
+  id        String    @id @default(uuid())
+  name      String
+  unit      String
+  unitPrice Decimal   @db.Decimal(15, 2)
+  merk      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  boqItems  BoqItem[]
+}
+
+// MASTER KOMPONEN MODEL (Reusable BOQ Components)
+model MasterKomponen {
+  id           String   @id @default(uuid())
+  kode         String   @unique
+  namaKomponen String
+  satuan       String
+  hargaSatuan  Decimal  @db.Decimal(15, 2)
+  tipe         String   @default("PERANGKAT")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// BOQ MODEL (Master BOQ Document)
+model BOQ {
+  id            String         @id @default(uuid())
+  projectId     String
+  namaBoq       String
+  keterangan    String?
+  tanggalBuat   DateTime       @default(now())
+  status        String         @default("DRAFT")
+  totalHarga    Decimal        @default(0.00) @db.Decimal(15, 2)
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items         BOQItemDetail[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([projectId])
+}
+
+// BOQ ITEM DETAIL MODEL (Detail items dalam BOQ)
+model BOQItemDetail {
+  id              String   @id @default(uuid())
+  boqId           String
+  masterKomponenId String
+  volume          Float
+  hargaSatuan     Decimal  @db.Decimal(15, 2)
+  totalHarga      Decimal  @db.Decimal(15, 2)
+  keterangan      String?
+  boq             BOQ      @relation(fields: [boqId], references: [id], onDelete: Cascade)
+
+  @@index([boqId])
+}
+
+// DOCUMENT MODEL
+model Document {
+  id         String   @id @default(uuid())
+  projectId  String
+  name       String
+  type       String
+  fileUrl    String
+  uploadedAt DateTime @default(now())
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// PROJECT MILESTONE MODEL
+model ProjectMilestone {
+  id        String          @id @default(uuid())
+  projectId String
+  stage     Int
+  name      String
+  status    MilestoneStatus @default(NOT_STARTED)
+  updatedAt DateTime        @updatedAt
+  picId     String?
+  pic       User?           @relation(fields: [picId], references: [id])
+  metadata  Json?
+  project   Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// PROGRESS LOG MODEL
+model ProgressLog {
+  id              String   @id @default(uuid())
+  projectId       String
+  week            Int
+  plannedProgress Float
+  actualProgress  Float
+  logDate         DateTime @default(now())
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, week])
 }
