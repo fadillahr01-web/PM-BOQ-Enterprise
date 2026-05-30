@@ -1,7 +1,5 @@
 FROM node:18-alpine
-
-RUN apk update && \
-    apk add --no-cache libssl1.1 --repository=http://dl-cdn.alpinelinux.org/alpine/v3.16/main libcrypto1.1 --repository=http://dl-cdn.alpinelinux.org/alpine/v3.16/main
+FROM node:18-alpine
 
 WORKDIR /app
 
@@ -10,8 +8,7 @@ RUN npm install
 
 COPY . .
 
-ENV PRISMA_CLIENT_ENGINE_TYPE="library"
-
+# Generate client otomatis dalam mode WASM karena fitur driverAdapters aktif
 RUN npx prisma generate --schema=./models/schema.prisma
 
 EXPOSE 7860
