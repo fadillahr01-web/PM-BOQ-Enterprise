@@ -4,11 +4,12 @@ datasource db {
 }
 
 generator client {
-  provider      = "prisma-client-js"
-  engineType    = "wasm"
+  provider        = "prisma-client-js"
+  engineType      = "wasm"
+  previewFeatures = ["driverAdapters"]
 }
 
-// Ini adalah model wajib yang diminta oleh mesin Prisma agar tidak eror
+// Biarkan model Project ini tetap ada di bawahnya
 model Project {
   id          String   @id @default(uuid())
   name        String
