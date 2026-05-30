@@ -1,14 +1,15 @@
 FROM node:18-alpine
-FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Mengambil package json dari folder Backend
+COPY Backend/package*.json ./
 RUN npm install
 
-COPY . .
+# Mengambil seluruh isi folder Backend
+COPY Backend/ .
 
-# Generate client otomatis dalam mode WASM karena fitur driverAdapters aktif
+# Jalankan prisma generate mengarah ke skema di dalam folder models
 RUN npx prisma generate --schema=./models/schema.prisma
 
 EXPOSE 7860
