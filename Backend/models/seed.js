@@ -1,5 +1,6 @@
+// KEMBALIKAN KE FORMAT INI:
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = new MyPrismaClient(); // pastikan tidak ada sub-path '/edge'
 
 async function main() {
   console.log('Seeding database...');
