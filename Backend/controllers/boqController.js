@@ -677,29 +677,13 @@ async function exportBOQToExcel(req, res) {
 
     // Generate file name
     const fileName = `BOQ_${project.name.replace(/\s+/g, '_')}_${Date.now()}.xlsx`;
-    const filePath = path.join(__dirname, '../exports', fileName);
 
-    // Create exports directory if not exists
-    const exportDir = path.join(__dirname, '../exports');
-    if (!fs.existsSync(exportDir)) {
-      fs.mkdirSync(exportDir, { recursive: true });
-    }
-
-    // Write file
-    await workbook.xlsx.writeFile(filePath);
-
-    // Send file
-    res.download(filePath, fileName, (err) => {
-      if (err) {
-        console.error('Error sending file:', err);
-      }
-      // Delete file after download
-      try {
-        fs.unlinkSync(filePath);
-      } catch (e) {
-        // File might have been deleted already
-      }
-    });
+    // Stream directly to response (serverless compatible - no disk write)
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    
+    await workbook.xlsx.write(res);
+    res.end();
   } catch (error) {
     console.error('Error exporting BOQ:', error);
     res.status(500).json({ error: 'Error exporting BOQ', details: error.message });

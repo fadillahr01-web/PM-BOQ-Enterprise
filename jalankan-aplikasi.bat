@@ -9,7 +9,7 @@ echo  Penyedia Sistem: Antigravity AI
 echo  OS Terdeteksi: Windows
 echo.
 echo  Batch script ini akan membuka 2 terminal baru untuk menjalankan:
-echo  1. Server Backend (Express API) - Port 5000
+echo  1. Server Backend (Express API) - Port 5001
 echo  2. Server Frontend (Next.js Web App) - Port 3000
 echo.
 echo =======================================================================
@@ -37,7 +37,7 @@ echo =======================================================================
 echo  BERHASIL DIJALANKAN!
 echo  ---------------------------------------------------------------------
 echo  - Frontend Web App : http://localhost:3000
-echo  - Backend API Gateway: http://localhost:5000
+echo  - Backend API Gateway: http://localhost:5001
 echo.
 echo  Silakan tunggu beberapa detik hingga server terkompilasi,
 echo  lalu buka browser Anda dan navigasikan ke: http://localhost:3000

@@ -11,19 +11,38 @@ const scurveRoutes = require('./routes/scurveRoutes');
 const refRoutes = require('./routes/refRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:3002',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:3001',
-  'http://127.0.0.1:3002'
-];
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    // Allow localhost for development
+    if (/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    // Allow any *.vercel.app domain (Vercel deployments)
+    if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    // Allow custom domains set via ALLOWED_ORIGINS env var
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -41,6 +60,10 @@ app.use('/api/s-curve', scurveRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date(), message: 'Backend server is running' });
+});
+
+app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date(), message: 'Backend server is running' });
 });
 
@@ -72,12 +95,16 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
+  res.status(404).json({ error: 'Endpoint not found', path: req.path });
 });
 
-app.listen(PORT, () => {
-  console.log(`\n🚀 PM-BOQ Enterprise Backend Server is running on port ${PORT}`);
-  console.log(`📍 Health Check: http://localhost:${PORT}/health`);
-  console.log(`📍 API Info: http://localhost:${PORT}/api/info`);
-  console.log(`📍 Frontend: http://localhost:3000\n`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 PM-BOQ Enterprise Backend Server is running on port ${PORT}`);
+    console.log(`📍 Health Check: http://localhost:${PORT}/health`);
+    console.log(`📍 API Info: http://localhost:${PORT}/api/info`);
+    console.log(`📍 Frontend: http://localhost:3000\n`);
+  });
+}
+
+module.exports = app;

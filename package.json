@@ -6,6 +6,9 @@
     "install:all": "npm install --prefix Backend && npm install --prefix Frontend",
     "dev:backend": "npm run dev --prefix Backend",
     "dev:frontend": "npm run dev --prefix Frontend",
-    "dev": "npx -y concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+    "dev": "npx -y concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "prisma:generate": "npx prisma generate --schema=Backend/models/schema.prisma",
+    "prisma:push": "npx prisma db push --schema=Backend/models/schema.prisma",
+    "vercel-build": "cd Backend && npx prisma generate --schema=models/schema.prisma && cd ../Frontend && npm run build"
   }
 }

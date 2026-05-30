@@ -22,7 +22,7 @@ interface Project {
 
 export default function ProjectDetailPage() {
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
   const { id: projectId } = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +36,7 @@ export default function ProjectDetailPage() {
     if (!projectId) return setLoading(false);
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/projects`);
+      const res = await fetch(`${API_URL}/projects`);
       if (!res.ok) return setLoading(false);
       const list = await res.json();
       const found = list.find((p: any) => p.id === projectId);
@@ -50,7 +50,7 @@ export default function ProjectDetailPage() {
 
   const exportBOQToExcel = () => {
     if (!projectId) return;
-    window.open(`${API_URL}/api/boq/${projectId}/export`, "_blank");
+    window.open(`${API_URL}/boq/${projectId}/export`, "_blank");
   };
 
   if (loading) {

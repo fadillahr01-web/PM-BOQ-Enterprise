@@ -33,7 +33,7 @@ const STATUS_COLORS: Record<string, { badge: string; text: string }> = {
 
 export default function ProjectsPage() {
     const router = useRouter();
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
     const [user, setUser] = useState<any>(null);
     const [allProjects, setAllProjects] = useState<ProjectListItem[]>([]);
     const [filteredProjects, setFilteredProjects] = useState<ProjectListItem[]>([]);
@@ -65,7 +65,7 @@ export default function ProjectsPage() {
     const loadProjects = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/api/projects`);
+            const res = await fetch(`${API_URL}/projects`);
             if (!res.ok) throw new Error('Failed to fetch projects');
             const projects = await res.json();
             
@@ -161,7 +161,7 @@ export default function ProjectsPage() {
     const handleSaveStatus = async (projectId: string) => {
         setSavingStatusId(projectId);
         try {
-            const res = await fetch(`${API_URL}/api/projects/${projectId}`, {
+            const res = await fetch(`${API_URL}/projects/${projectId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: editStatus })

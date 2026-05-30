@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 Frontend/node_modules/
+Backend/node_modules/
 
 # Next.js build output & cache
 .next/
@@ -17,3 +18,14 @@ yarn-error.log*
 
 # Local env files
 .env*.local
+Backend/.env
+
+# Vercel
+.vercel/
+
+# Prisma
+Backend/models/migrations/
+
+# OS
+.DS_Store
+Thumbs.db

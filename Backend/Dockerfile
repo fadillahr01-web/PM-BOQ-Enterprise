@@ -6,6 +6,9 @@ COPY package*.json ./
 
 RUN npm install
 
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
 # Salin semua kode backend
 COPY . .
 

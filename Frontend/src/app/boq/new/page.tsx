@@ -32,7 +32,7 @@ interface BoqItemRow {
 
 export default function CreateBoqPage() {
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
   const [projects, setProjects] = useState<ProjectOption[]>([]);
   const [components, setComponents] = useState<BoqComponent[]>([]);
   const [projectId, setProjectId] = useState('');
@@ -47,8 +47,8 @@ export default function CreateBoqPage() {
     const loadData = async () => {
       try {
         const [projectRes, componentRes] = await Promise.all([
-          fetch(`${API_URL}/api/projects`),
-          fetch(`${API_URL}/api/boq/components`)
+          fetch(`${API_URL}/projects`),
+          fetch(`${API_URL}/boq/components`)
         ]);
 
         if (!projectRes.ok || !componentRes.ok) {
@@ -138,7 +138,7 @@ export default function CreateBoqPage() {
         ]
       };
 
-      const response = await fetch(`${API_URL}/api/boq/${projectId}`, {
+      const response = await fetch(`${API_URL}/boq/${projectId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

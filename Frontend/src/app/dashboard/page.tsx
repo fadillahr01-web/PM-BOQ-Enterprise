@@ -49,7 +49,7 @@ interface ScurvePoint {
 
 export default function ProjectDashboard() {
     const router = useRouter();
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
     const [user, setUser] = useState<any>(null);
 
     // Global Data
@@ -78,7 +78,7 @@ export default function ProjectDashboard() {
     const fetchInitialData = async () => {
         setLoading(true);
         try {
-            const projectsRes = await fetch(`${API_URL}/api/projects`);
+            const projectsRes = await fetch(`${API_URL}/projects`);
             if (!projectsRes.ok) throw new Error('Failed to fetch projects');
             const projects = await projectsRes.json();
 
@@ -133,7 +133,7 @@ export default function ProjectDashboard() {
         const fetchProjectDetails = async () => {
             try {
                 // Fetch tasks
-                const tasksRes = await fetch(`${API_URL}/api/tasks?projectId=${selectedProjectId}`);
+                const tasksRes = await fetch(`${API_URL}/tasks?projectId=${selectedProjectId}`);
                 if (tasksRes.ok) {
                     const liveTasks = await tasksRes.json();
                     setTasks(liveTasks.map((t: any) => ({
@@ -147,7 +147,7 @@ export default function ProjectDashboard() {
                 }
 
                 // Fetch S-Curve
-                const scurveRes = await fetch(`${API_URL}/api/s-curve/${selectedProjectId}`);
+                const scurveRes = await fetch(`${API_URL}/s-curve/${selectedProjectId}`);
                 if (scurveRes.ok) {
                     const logs = await scurveRes.json();
                     setScurveData(logs || []);

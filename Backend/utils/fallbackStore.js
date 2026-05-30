@@ -1,5 +1,4 @@
 // Simulated in-memory database store for fallback when database connection is offline.
-const { v4: uuidv4 } = require('uuid');
 
 const users = [
   { id: "u-admin", email: "admin@project.com", name: "Administrator", password: "Admin123", role: "ADMIN" },
@@ -21,7 +20,7 @@ const projects = [
     endDate: "2026-08-15T00:00:00.000Z",
     plannedProgress: 65.0,
     actualProgress: 58.5,
-    status: "IN_PROGRESS",
+    status: "SPK",
   }
 ];
 

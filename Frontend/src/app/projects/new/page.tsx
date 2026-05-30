@@ -34,7 +34,7 @@ const defaultChecklist: ProjectChecklistItem[] = [
 
 export default function NewProjectPage() {
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   
@@ -98,10 +98,10 @@ export default function NewProjectPage() {
         endDate: formData.endDate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         plannedProgress: 0,
         actualProgress: 0,
-        status: 'NOT_STARTED',
+        status: 'BOQ',
       };
 
-      const response = await fetch(`${API_URL}/api/projects`, {
+      const response = await fetch(`${API_URL}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

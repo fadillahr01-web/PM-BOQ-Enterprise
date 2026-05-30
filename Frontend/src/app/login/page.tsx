@@ -24,7 +24,7 @@ declare global {
 
 export default function LoginPage() {
   const router = useRouter();
-  const API_URL  = process.env.NEXT_PUBLIC_API_URL        || 'http://localhost:5001';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
   const G_CLIENT = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
 
   const [error,       setError]       = useState('');
@@ -43,7 +43,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`${API_URL}/api/auth/google`, {
+      const res = await fetch(`${API_URL}/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: response.credential }),

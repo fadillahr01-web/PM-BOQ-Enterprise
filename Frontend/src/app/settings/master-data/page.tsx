@@ -31,7 +31,7 @@ export default function MasterDataPage() {
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   // Form State
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
   const [isEditing, setIsEditing] = useState(false);
   const [currentTab, setCurrentTab] = useState('materials');
   const [formData, setFormData] = useState<{ id?: string, name: string, unit: string, unitPrice: number | string, merk: string }>({ 
@@ -49,9 +49,9 @@ export default function MasterDataPage() {
     setLoading(true);
     try {
       const [matRes, srvRes, projRes] = await Promise.all([
-        fetch(`${API_URL}/api/ref/materials`),
-        fetch(`${API_URL}/api/ref/services`),
-        fetch(`${API_URL}/api/projects`)
+        fetch(`${API_URL}/ref/materials`),
+        fetch(`${API_URL}/ref/services`),
+        fetch(`${API_URL}/projects`)
       ]);
 
       if (matRes.ok) setMaterials(await matRes.json());
@@ -80,7 +80,7 @@ export default function MasterDataPage() {
     }
 
     try {
-      const endpoint = currentTab === 'materials' ? '/api/ref/materials' : '/api/ref/services';
+      const endpoint = currentTab === 'materials' ? '/ref/materials' : '/ref/services';
       const url = formData.id 
         ? `${API_URL}${endpoint}/${formData.id}` 
         : `${API_URL}${endpoint}`;
@@ -113,7 +113,7 @@ export default function MasterDataPage() {
   const handleDelete = async (id: string, type: 'materials' | 'services') => {
     if (!window.confirm('Yakin ingin menghapus item ini?')) return;
     try {
-      const endpoint = type === 'materials' ? '/api/ref/materials' : '/api/ref/services';
+      const endpoint = type === 'materials' ? '/ref/materials' : '/ref/services';
       const res = await fetch(`${API_URL}${endpoint}/${id}`, {
         method: 'DELETE'
       });
