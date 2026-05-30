@@ -1,14 +1,11 @@
-const { Pool } = require('pg');
-const { PrismaPg } = require('@prisma/adapter-pg');
 const { PrismaClient } = require('@prisma/client');
 
-// 1. Buat koneksi pool menggunakan pg driver bawaan node
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Inisialisasi Prisma standar tanpa adapter yang rumit
+const prisma = new PrismaClient();
 
-// 2. Masukkan pool ke dalam adapter Prisma
-const adapter = new PrismaPg(pool);
-
-// 3. Inisialisasi Prisma dengan adapter (Ini akan otomatis menggunakan WASM Engine)
-const prisma = new PrismaClient({ adapter });
+// Tes koneksi ringan saat server menyala
+prisma.$connect()
+  .then(() => console.log("✅ Berhasil terhubung ke Database!"))
+  .catch((err) => console.error("❌ Gagal terhubung ke Database:", err));
 
 module.exports = prisma;
