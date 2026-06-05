@@ -24,14 +24,19 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Routes
-app.use('/api/projects', projectRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/boq', boqRoutes);
-app.use('/api/master-komponen', masterKomponenRoutes);
-app.use('/api/ref', refRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/milestones', milestoneRoutes);
-app.use('/api/s-curve', scurveRoutes);
+const apiRouter = express.Router();
+apiRouter.use('/projects', projectRoutes);
+apiRouter.use('/tasks', taskRoutes);
+apiRouter.use('/boq', boqRoutes);
+apiRouter.use('/master-komponen', masterKomponenRoutes);
+apiRouter.use('/ref', refRoutes);
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/milestones', milestoneRoutes);
+apiRouter.use('/s-curve', scurveRoutes);
+
+// Mount API router on both /api and / to handle Vercel serverless path rewriting
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
