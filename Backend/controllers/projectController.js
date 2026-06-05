@@ -133,7 +133,7 @@ async function getProjectById(req, res) {
   }
 }
 
-// Update project details (status, dates)
+// Create a new project
 async function createProject(req, res) {
   const { name, clientName, location, budget, actualCost, startDate, endDate, plannedProgress, actualProgress, status, description } = req.body;
 
@@ -160,12 +160,37 @@ async function createProject(req, res) {
 
     return res.status(201).json(project);
   } catch (error) {
-    console.error('Failed to create project:', error);
-    const payload = { error: 'Cannot create project' };
-    if (process.env.NODE_ENV !== 'production' && error instanceof Error) {
-      payload.detail = error.message;
+    console.error('Failed to create project in DB, falling back to memory:', error.message);
+    
+    // Fallback: save to in-memory store
+    try {
+      const newProject = {
+        id: 'p-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+        name,
+        clientName,
+        location,
+        budget: budget || 0,
+        actualCost: actualCost || 0,
+        startDate: startDate || new Date().toISOString(),
+        endDate: endDate || new Date().toISOString(),
+        plannedProgress: plannedProgress ?? 0,
+        actualProgress: actualProgress ?? 0,
+        status: status || 'BOQ',
+        description: description || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      fallbackStore.projects.push(newProject);
+      return res.status(201).json({ ...newProject, fallback: true });
+    } catch (fallbackError) {
+      console.error('Fallback also failed:', fallbackError.message);
+      const payload = { error: 'Cannot create project' };
+      if (process.env.NODE_ENV !== 'production' && error instanceof Error) {
+        payload.detail = error.message;
+      }
+      return res.status(500).json(payload);
     }
-    return res.status(500).json(payload);
   }
 }
 

@@ -66,7 +66,14 @@ export default function NewProjectPage() {
   };
 
   const parseApiError = async (response: Response) => {
-    const defaultText = `${response.status} ${response.statusText}`;
+    const status = response.status;
+    const defaultText = `${status}`;
+    
+    // Handle common HTTP errors with user-friendly messages
+    if (status === 503) return 'Server sedang tidak tersedia (503). Pastikan backend sudah di-deploy dan environment variables sudah diatur di Vercel.';
+    if (status === 502) return 'Bad Gateway (502). Backend tidak merespon.';
+    if (status === 504) return 'Gateway Timeout (504). Koneksi ke database terlalu lambat.';
+    
     try {
       const body = await response.json();
       if (body?.error) return body.error;

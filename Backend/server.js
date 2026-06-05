@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const projectRoutes = require('./routes/projectRoutes');
@@ -15,34 +16,8 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, server-to-server)
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
-
-    // Allow localhost for development
-    if (/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
-      callback(null, true);
-      return;
-    }
-
-    // Allow any *.vercel.app domain (Vercel deployments)
-    if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
-      callback(null, true);
-      return;
-    }
-
-    // Allow custom domains set via ALLOWED_ORIGINS env var
-    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-      return;
-    }
-
-    callback(new Error('Not allowed by CORS'));
-  },
+  origin: '*', // Izinkan semua domain untuk tes.
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));

@@ -1,6 +1,7 @@
 // KEMBALIKAN KE FORMAT INI:
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const { PrismaClient } = require('@prisma/client');
-const prisma = new MyPrismaClient(); // pastikan tidak ada sub-path '/edge'
+const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding database...');
